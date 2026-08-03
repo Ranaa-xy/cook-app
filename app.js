@@ -230,7 +230,7 @@ async function loadMoreRecipes() {
 
 已推荐过的菜（请勿重复）：${shown.join('、')}
 
-请作为中餐大厨，再推荐 3 道用这些食材能做的其他经典菜。
+请作为中餐大厨，再推荐 2 道用这些食材能做的其他经典菜。
 
 返回纯 JSON：
 {
@@ -245,7 +245,7 @@ async function loadMoreRecipes() {
     }
   ]
 }
-要求：dishes 列 3 道，必须是上面"已推荐过"列表里没有的菜。`;
+要求：dishes 列 2 道，必须是上面"已推荐过"列表里没有的菜。`;
 
     showLoading('搜索更多菜谱中...');
 
@@ -514,7 +514,7 @@ function buildVisionPrompt() {
 
 重要：
 - ingredients 必须列出所有识别到的食材
-- dishes 务必列出该食材 5 道最经典的做法，每道都要有完整步骤
+- dishes 列出该食材 3 道最经典的做法，每道都要有完整步骤
 - 比如里脊肉：糖醋里脊、鱼香肉丝、锅包肉、青椒肉丝、干炸里脊、葱爆肉、水煮肉片、宫保肉丁、回锅肉、木须肉
 - 如果食材不能一起做，canCookTogether 填 false，在 alternatives 里分别说每种能做什么
 - conflicts 注意海鲜+维C、柿子+螃蟹等相克组合
@@ -526,7 +526,7 @@ function buildRecipeOnlyPrompt(ingredients) {
     const list = arr.join('、');
     return `用户有这些食材：${list}
 
-请作为中餐大厨，告诉我能用这些食材做什么菜，列出 5 道经典做法。
+请作为中餐大厨，告诉我能用这些食材做什么菜，列出 3 道经典做法。
 
 请返回纯 JSON（不要加解释）：
 
@@ -548,13 +548,20 @@ function buildRecipeOnlyPrompt(ingredients) {
   "nutrition": "营养说明"
 }
 
-要求：dishes 务必列满 5 道经典家常做法（不要少），每道至少 3 个步骤。`;
+要求：dishes 列出 3 道经典家常做法，每道至少 3 个步骤。`;
 }
 
 // ==================== 工具函数 ====================
 function getMaxTokens(provider) {
-    if (provider === 'zhipu') return 1024;  // 智谱限制
+    if (provider === 'zhipu') return 1024;
     return 4096;
+}
+function getDishCount(provider) {
+    if (provider === 'zhipu') return 3;  // 智谱1024token只够3道菜
+    return 5;
+}
+function getDishWord(provider) {
+    return getDishCount(provider) + ' 道';
 }
 /** 确保食材一定是数组 */
 function ensureArray(val) {
@@ -567,17 +574,55 @@ function ensureArray(val) {
 function parseAIResponse(text, editedIngredients) {
     let cleanText = text.trim();
 
-    // 策略0：去掉编号前缀（智谱经常返回 "1. ```json"）
-    cleanText = cleanText.replace(/^\d+\.\s*```(?:json)?\s*\n?/i, '').replace(/^```(?:json)?\s*\n?/i, '');
-    cleanText = cleanText.replace(/\n?```\s*$/i, '').trim();
+    // 策略0：去掉各种 markdown 代码块格式
+    // 1. 去掉 "1. ```json" 或 "1.```json" 等编号前缀
+    cleanText = cleanText.replace(/^\d+\.?\s*```(?:json)?\s*/i, '');
+    // 2. 去掉开头的 ```json 或 ```
+    cleanText = cleanText.replace(/^```(?:json)?\s*/i, '');
+    // 3. 去掉结尾的 ```
+    cleanText = cleanText.replace(/\s*```\s*$/i, '');
+    // 4. 如果还有内嵌的 ```，也去掉
+    cleanText = cleanText.replace(/```(?:json)?/gi, '');
+    cleanText = cleanText.trim();
 
     // 策略1：直接解析
     try { return normalizeResult(JSON.parse(cleanText), editedIngredients); } catch (e) {}
 
-    // 策略2：正则提取 JSON 块（更宽松的匹配）
-    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    // 策略2：正则提取 JSON（尝试补全截断的 JSON）
+    let jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+        // JSON 可能被截断，尝试补全
+        const partial = cleanText.match(/\{[\s\S]*/);
+        if (partial) {
+            let fixed = partial[0];
+            // 数括号，补齐未闭合的
+            let open = 0, inStr = false, escape = false;
+            for (const c of fixed) {
+                if (escape) { escape = false; continue; }
+                if (c === '\\') { escape = true; continue; }
+                if (c === '"') inStr = !inStr;
+                if (inStr) continue;
+                if (c === '{' || c === '[') open++;
+                if (c === '}' || c === ']') open--;
+            }
+            while (open > 0) { fixed += (open % 2 ? '}' : ']'); open--; }
+            // 补齐可能断开的字符串值和数组
+            fixed = fixed.replace(/,\s*$/, '');  // 去掉尾部逗号
+            if (!fixed.endsWith('"') && fixed.lastIndexOf('"') > fixed.lastIndexOf(':')) {
+                fixed += '"';
+            }
+            jsonMatch = [fixed + "}]\"}"];  // 兜底闭合
+        }
+    }
     if (jsonMatch) {
-        try { return normalizeResult(JSON.parse(jsonMatch[0]), editedIngredients); } catch (e) {}
+        try { return normalizeResult(JSON.parse(jsonMatch[0]), editedIngredients); } catch (e2) {
+            // 最后一次尝试：去掉最后可能损坏的部分
+            const lastBrace = jsonMatch[0].lastIndexOf('}');
+            if (lastBrace > 10) {
+                const truncated = jsonMatch[0].substring(0, lastBrace) + "}]\"}";
+                try { return normalizeResult(JSON.parse(truncated), editedIngredients); } catch (e3) {}
+            }
+        }
     }
 
     // 策略3：部分提取
@@ -600,7 +645,13 @@ function normalizeResult(result, editedIngredients) {
                 difficulty: d.difficulty || '中等',
                 time: d.time || d.cookingTime || '约30分钟',
                 materials: ensureArray(d.materials || d.ingredients_needed || []),
-                steps: ensureArray(d.steps || []),
+                steps: ensureArray(d.steps || []).filter(s => {
+                    if (typeof s !== 'string') return true;
+                    // 过滤掉误入的 JSON 碎片
+                    const t = s.trim();
+                    if (t.startsWith('{') || t.startsWith('"ingredients"') || t.startsWith('"dishes"') || t.length > 200) return false;
+                    return t.length > 0;
+                }),
                 tip: d.tip || d.tips || '',
             };
         }),
@@ -789,9 +840,15 @@ function renderResult(result) {
                             🛒 材料：${dish.materials.map(i => escapeHtml(i)).join('、')}
                         </p>
                     ` : ''}
-                    ${dish.steps && dish.steps.length > 0 ? `
-                        <div class="recipe-text">${dish.steps.map((s, i) => `${i + 1}. ${escapeHtml(s)}`).join('\n')}</div>
-                    ` : ''}
+                    ${(() => {
+                        const clean = (dish.steps || []).filter(s => {
+                            if (typeof s !== 'string') return true;
+                            const t = s.trim();
+                            if (!t || t.startsWith('{') || t.startsWith('"ingredients"') || t.startsWith('"dishes"') || t.includes('"canCookTogether"')) return false;
+                            return true;
+                        });
+                        return clean.length > 0 ? `<div class="recipe-text">${clean.map((s, i) => `${i + 1}. ${escapeHtml(s)}`).join('\n')}</div>` : '';
+                    })()}
                     ${dish.tip ? `<p style="margin-top:8px;font-size:13px;color:#F59E0B;">💡 ${escapeHtml(dish.tip)}</p>` : ''}
                     <button class="dish-image-btn" onclick="openImageSearch('${jsEscape(dishName)}')">🖼 查看成品图</button>
                     <div class="video-links">
