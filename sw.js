@@ -3,7 +3,7 @@
  * 提供离线缓存和 PWA 支持
  */
 
-const CACHE_NAME = 'cookcam-v2';
+const CACHE_NAME = 'cookcam-v4';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
