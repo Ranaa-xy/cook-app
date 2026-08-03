@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FFB6C1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="拍照识菜">
+    <title>拍照识菜 🍳</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========== 顶部导航栏 ========== -->
+    <header class="header">
+        <h1 class="logo" id="headerTitle">🍳 该做饭啦！</h1>
+        <button class="btn-icon" id="btnSettings" title="设置">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+            </svg>
+        </button>
+    </header>
+
+    <!-- ========== 主内容区 ========== -->
+    <main class="main-content">
+
+        <!-- ===== 页面：首页 ===== -->
+        <section id="pageHome" class="page active">
+            <!-- 搜索栏 -->
+            <div class="text-input-area">
+                <input type="text" id="textIngredientsInput" class="input"
+                    placeholder="📝 输入食材，如：里脊肉,青椒"
+                    style="font-size:14px;padding:10px 14px;">
+                <button class="btn btn-primary" id="btnTextSearch" style="font-size:14px;padding:10px 16px;">🔍 搜</button>
+            </div>
+
+            <!-- 功能入口 - 可爱框框分组 -->
+            <div class="home-section">
+                <div class="section-title">🍳 快速入口</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="btnQuickSearch">🔎<br>知道吃什么</button>
+                    <button class="quick-btn" id="btnQuickPicker">🥬<br>快速选食材</button>
+                    <button class="quick-btn" id="btnQuickConflict">⚠️<br>食物相克</button>
+                </div>
+            </div>
+            <div class="home-section">
+                <div class="section-title">📖 食谱大全</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="btnQuickNoodles">🍜<br>面食大全</button>
+                    <button class="quick-btn" id="btnQuickDessert">🍰<br>甜品大全</button>
+                    <button class="quick-btn" id="btnQuickAirfryer">🔥<br>空气炸锅</button>
+                </div>
+            </div>
+            <div class="home-section">
+                <div class="section-title">📋 记录</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="btnQuickHistory">📋<br>历史记录</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Tab页：菜谱（厨神厨房） ===== -->
+        <section id="pageRecipes" class="page">
+            <div style="padding-top:4px;">
+                <button class="btn btn-primary" id="btnAddDish2" style="width:100%;margin-bottom:12px;">＋ 添加新菜</button>
+                <div id="kitchenDishes2"></div>
+            </div>
+        </section>
+
+        <!-- ===== Tab页：点菜 ===== -->
+        <section id="pageOrderTab" class="page">
+            <div style="padding-top:4px;">
+                <div class="order-room-area">
+                    <input type="text" id="orderRoomInput2" class="input" placeholder="输入房间号（两人填一样的）" style="flex:1;">
+                    <button class="btn btn-primary" id="btnJoinRoom2" style="white-space:nowrap;">加入</button>
+                </div>
+                <p id="orderRoomStatus2" style="text-align:center;font-size:12px;color:#9E9E9E;margin:6px 0;"></p>
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                    <input type="text" id="orderDishInput2" class="input" placeholder="输入想点的菜..." style="flex:1;">
+                    <button class="btn btn-primary" id="btnAddOrder2" style="white-space:nowrap;">➕ 点菜</button>
+                </div>
+                <div id="orderList2"></div>
+            </div>
+        </section>
+
+        <!-- ===== Tab页：我的 ===== -->
+        <section id="pageProfile" class="page">
+            <div style="padding-top:8px;">
+                <div class="result-card" style="cursor:pointer;" id="btnSettings2">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="font-size:28px;">⚙️</span>
+                        <div>
+                            <div style="font-weight:600;">AI 设置</div>
+                            <div style="font-size:12px;color:#9E9E9E;">配置 API Key 和模型</div>
+                        </div>
+                        <span style="margin-left:auto;color:#CCC;">›</span>
+                    </div>
+                </div>
+                <div class="result-card" onclick="switchPage('pageHistory')" style="cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="font-size:28px;">📋</span>
+                        <div>
+                            <div style="font-weight:600;">历史记录</div>
+                            <div style="font-size:12px;color:#9E9E9E;">查看之前的识别记录</div>
+                        </div>
+                        <span style="margin-left:auto;color:#CCC;">›</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== 页面：结果展示 ===== -->
+        <section id="pageResult" class="page">
+            <div id="resultContent"></div>
+            <div class="action-bar">
+                <button class="btn btn-primary" id="btnBackHome">🏠 返回首页</button>
+                <button class="btn btn-outline" id="btnRetake">📸 重新拍照</button>
+            </div>
+        </section>
+
+        <!-- ===== 页面：相克查询 ===== -->
+        <section id="pageConflict" class="page">
+            <div class="conflict-search">
+                <input type="text" id="conflictInput1" placeholder="食物1" class="input">
+                <span class="vs-text">+</span>
+                <input type="text" id="conflictInput2" placeholder="食物2" class="input">
+                <button class="btn btn-primary" id="btnCheckConflict">🔍 查询</button>
+            </div>
+            <div id="conflictResult" class="conflict-result"></div>
+            <div class="conflict-list" id="conflictList"></div>
+            <button class="btn btn-outline" id="btnBackFromConflict">🏠 返回首页</button>
+        </section>
+
+        <!-- ===== 页面：历史记录 ===== -->
+        <section id="pageHistory" class="page">
+            <div id="historyList" class="history-list"></div>
+            <button class="btn btn-outline" id="btnBackFromHistory">🏠 返回首页</button>
+        </section>
+
+        <!-- ===== 页面：知道吃什么（直接搜菜名） ===== -->
+        <section id="pageSearch" class="page">
+            <div style="padding: 10px 0;">
+                <input type="text" id="searchDishInput" class="input" placeholder="输入菜名，如：糖醋里脊、麻婆豆腐..."
+                    style="font-size:17px;padding:14px;text-align:center;">
+                <button class="btn btn-primary" id="btnSearchDish" style="width:100%;margin-top:10px;">
+                    🔍 搜索做法
+                </button>
+            </div>
+            <p style="text-align:center;color:#9E9E9E;font-size:13px;margin:8px 0;">💡 直接输入你想做的菜名，AI 帮你找做法</p>
+            <div id="searchResult"></div>
+            <button class="btn btn-outline" id="btnBackFromSearch">🏠 返回首页</button>
+        </section>
+
+        <!-- ===== 页面：面食大全 ===== -->
+        <section id="pageNoodles" class="page">
+            <h2 style="text-align:center;margin-bottom:12px;">🍜 面食大全</h2>
+            <div class="noodle-grid" id="noodleGrid"></div>
+            <div id="noodleDetail" style="display:none;"></div>
+            <button class="btn btn-outline" id="btnBackFromNoodles">🏠 返回首页</button>
+        </section>
+
+        <!-- ===== 页面：甜品大全 ===== -->
+        <section id="pageDessert" class="page">
+            <h2 style="text-align:center;margin-bottom:12px;">🍰 甜品大全</h2>
+            <div class="noodle-grid" id="dessertGrid"></div>
+            <div id="dessertDetail" style="display:none;"></div>
+            <button class="btn btn-outline" id="btnBackFromDessert">🏠 返回首页</button>
+        </section>
+
+        <!-- ===== 页面：空气炸锅 ===== -->
+        <section id="pageAirfryer" class="page">
+            <h2 style="text-align:center;margin-bottom:8px;">🔥 空气炸锅大全</h2>
+            <div class="time-filter" id="airfryerTimeFilter">
+                <button class="time-filter-btn active" data-filter="all">全部</button>
+                <button class="time-filter-btn" data-filter="fast">⚡ 10分钟内</button>
+                <button class="time-filter-btn" data-filter="mid">⏱ 10-20分钟</button>
+                <button class="time-filter-btn" data-filter="slow">🕐 20分钟以上</button>
+            </div>
+            <div class="airfryer-tabs" style="display:flex;gap:8px;margin-bottom:12px;">
+                <button class="btn btn-primary airfryer-tab active" data-tab="all" style="flex:1;font-size:13px;">全部</button>
+                <button class="btn btn-outline airfryer-tab" data-tab="自制" style="flex:1;font-size:13px;">🍳 自制</button>
+                <button class="btn btn-outline airfryer-tab" data-tab="半成品" style="flex:1;font-size:13px;">📦 半成品</button>
+            </div>
+            <div id="airfryerList"></div>
+            <button class="btn btn-outline" id="btnBackFromAirfryer">🏠 返回首页</button>
+        </section>
+
+        <!-- ===== 添加/编辑菜品弹窗 ===== -->
+        <div class="modal-overlay" id="modalAddDish">
+            <div class="modal-card">
+                <h2>🍽 添加私房菜</h2>
+                <label class="label">菜名</label>
+                <input type="text" id="dishNameInput" class="input" placeholder="给你的菜起个名字">
+                <label class="label">成品图</label>
+                <input type="file" id="dishImageInput" accept="image/*" capture="environment">
+                <div id="dishImagePreview" style="margin:6px 0;text-align:center;"></div>
+                <label class="label">做法/备注</label>
+                <textarea id="dishRecipeInput" class="input" rows="4" placeholder="写下做法或备注..." style="resize:vertical;"></textarea>
+                <input type="hidden" id="dishEditId" value="">
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="btnSaveDish">💾 保存</button>
+                    <button class="btn btn-ghost" id="btnCancelDish">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 页面：快速选食材 ===== -->
+        <section id="pagePicker" class="page">
+            <h2 style="text-align:center;margin-bottom:8px;">🥬 手动选食材</h2>
+            <p style="text-align:center;color:#9E9E9E;font-size:13px;margin-bottom:12px;">不用拍照，直接点选你有的食材</p>
+            <div id="pickerCategories"></div>
+            <div class="ingredient-tags" id="pickedIngredients" style="min-height:40px;margin:12px 0;">
+                <span style="color:#9E9E9E;">👆 点击上方食材添加到列表</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary" id="btnPickerSearch" style="flex:1;" disabled>🔍 查菜谱</button>
+                <button class="btn btn-ghost" id="btnPickerClear" style="flex:1;">清空</button>
+            </div>
+            <button class="btn btn-outline" id="btnBackFromPicker" style="margin-top:10px;">🏠 返回首页</button>
+        </section>
+
+    </main>
+
+    <!-- ========== 底部导航栏 ========== -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span><span class="nav-label">首页</span>
+        </div>
+        <div class="nav-item" data-tab="recipes" onclick="switchTab('recipes')">
+            <span class="nav-icon">📖</span><span class="nav-label">菜谱</span>
+        </div>
+        <div class="nav-item nav-center" data-tab="camera" onclick="switchTab('camera')">
+            <div class="nav-camera"><span>📸</span></div>
+        </div>
+        <div class="nav-item" data-tab="order" onclick="switchTab('order')">
+            <span class="nav-icon">📋</span><span class="nav-label">点菜</span>
+        </div>
+        <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span><span class="nav-label">我的</span>
+        </div>
+    </nav>
+
+    <!-- ========== 加载遮罩 ========== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-card">
+            <img src="cooking.gif" alt="烹饪中..." class="loading-gif">
+            <p class="loading-text" id="loadingText">AI大厨正在烹饪中...</p>
+            <p class="loading-sub" id="loadingSub">食材识别 + 菜谱生成</p>
+        </div>
+    </div>
+
+    <!-- ========== AI 设置弹窗 ========== -->
+    <div class="modal-overlay" id="modalSettings">
+        <div class="modal-card">
+            <h2>⚙️ AI 设置</h2>
+            <p class="modal-desc">需要配置 AI 接口才能使用识别功能</p>
+            <label class="label">AI 服务商</label>
+            <select id="aiProvider" class="input">
+                <option value="qwen">通义千问</option>
+                <option value="zhipu">智谱 GLM-4V（推荐 ⭐ 识图强）</option>
+                <option value="stepfun">阶跃星辰 Step-1V（识图强）</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="custom">自定义 API</option>
+            </select>
+            <label class="label">API Key</label>
+            <input type="password" id="apiKey" class="input" placeholder="粘贴你的 API Key">
+            <p class="input-hint" id="apiKeyHint">
+                去 <a href="https://dashscope.aliyun.com" target="_blank">dashscope.aliyun.com</a> 注册获取免费 Key
+            </p>
+            <label class="label">模型名称（可选）</label>
+            <input type="text" id="modelName" class="input" placeholder="留空自动选择">
+            <div id="customApiFields" style="display:none">
+                <label class="label">自定义 API 地址</label>
+                <input type="text" id="customEndpoint" class="input" placeholder="https://api.xxx.com/v1/chat/completions">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="btnSaveSettings">💾 保存</button>
+                <button class="btn btn-ghost" id="btnCancelSettings">取消</button>
+            </div>
+            <div class="modal-note">
+                <p>💡 <strong>推荐：通义千问（支持图片识别！）</strong></p>
+                <p>1. 打开 <strong>阿里云百炼</strong>（dashscope.aliyun.com）</p>
+                <p>2. 注册/登录 → 开通 qwen-vl-plus</p>
+                <p>3. API-KEY 管理 → 创建新 Key</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 相克弹窗 ========== -->
+    <div class="modal-overlay" id="modalConflictAlert">
+        <div class="modal-card conflict-alert">
+            <div class="conflict-icon">⚠️</div>
+            <h2>食物相克提醒</h2>
+            <div id="conflictAlertContent"></div>
+            <button class="btn btn-primary" id="btnCloseConflictAlert">我知道了</button>
+        </div>
+    </div>
+
+    <!-- ========== 成品图弹窗（内嵌图片搜索） ========== -->
+    <div class="modal-overlay" id="modalImageSearch">
+        <div class="image-search-container">
+            <div class="image-search-header">
+                <h3>🖼 成品图参考</h3>
+                <button class="btn-close-preview" id="btnCloseImageSearch">✕</button>
+            </div>
+            <iframe id="imageSearchFrame" src="" frameborder="0"
+                style="width:100%;height:70vh;border-radius:12px;"
+                sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+            <p style="text-align:center;font-size:11px;color:#9E9E9E;margin-top:6px;">
+                如加载失败，请点击<a id="imageFallbackLink" href="#" target="_blank" style="color:#FF6B84;">这里</a>在新窗口打开
+            </p>
+        </div>
+    </div>
+
+    <!-- ========== 图片预览弹窗 ========== -->
+    <div class="modal-overlay" id="modalImagePreview">
+        <div class="image-preview-container">
+            <img id="previewImage" src="" alt="预览">
+            <button class="btn-close-preview" id="btnClosePreview">✕</button>
+        </div>
+    </div>
+
+    <!-- ========== 隐藏的文件选择器 ========== -->
+    <input type="file" id="fileInput" accept="image/*" capture="environment" multiple hidden>
+
+    <!-- ========== Toast ========== -->
+    <div class="toast" id="toast"></div>
+
+    <script src="conflict-data.js"></script>
+    <script src="ingredient-data.js"></script>
+    <script src="noodle-data.js"></script>
+    <script src="dessert-data.js"></script>
+    <script src="airfryer-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
