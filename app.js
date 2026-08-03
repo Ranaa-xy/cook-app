@@ -35,78 +35,78 @@ function registerServiceWorker() {
 }
 
 // ==================== 事件绑定 ====================
+// 安全绑定：元素不存在就跳过
+function safeOn(sel, event, fn) {
+    const el = typeof sel === 'string' ? $(sel) : sel;
+    if (el) el.addEventListener(event, fn);
+}
+
 function bindEvents() {
-    $('#btnAddPhoto').addEventListener('click', () => $('#fileInput').click());
-    $('#fileInput').addEventListener('change', handleFilesSelected);
-
-    // 图片网格：删除 / 预览
-    $('#imageGrid').addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-remove')) {
-            removeImage(e.target.dataset.id);
-            return;
-        }
+    safeOn('#fileInput', 'change', handleFilesSelected);
+    safeOn('#imageGrid', 'click', (e) => {
+        if (e.target.classList.contains('btn-remove')) { removeImage(e.target.dataset.id); return; }
         const slot = e.target.closest('.image-slot.filled');
-        if (slot) {
-            const img = slot.querySelector('img');
-            if (img) previewImage(img.src);
-        }
+        if (slot) { const img = slot.querySelector('img'); if (img) previewImage(img.src); }
     });
-
-    $('#btnRecognize').addEventListener('click', startRecognition);
-    $('#btnClear').addEventListener('click', clearAllImages);
-    $('#btnQuickConflict').addEventListener('click', () => switchPage('pageConflict'));
-    $('#btnQuickHistory').addEventListener('click', () => { renderHistory(); switchPage('pageHistory'); });
-    $('#btnQuickSearch').addEventListener('click', () => switchPage('pageSearch'));
-    $('#btnQuickNoodles').addEventListener('click', () => { renderNoodlePage(); switchPage('pageNoodles'); });
-    $('#btnQuickDessert').addEventListener('click', () => { renderDessertPage(); switchPage('pageDessert'); });
-    $('#btnQuickAirfryer').addEventListener('click', () => { renderAirfryerPage(); switchPage('pageAirfryer'); });
-    $('#btnQuickPicker').addEventListener('click', () => { renderPickerPage(); switchPage('pagePicker'); });
-    $('#btnBackHome').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnRetake').addEventListener('click', () => { clearAllImages(); switchPage('pageHome'); });
-    $('#btnCheckConflict').addEventListener('click', doConflictCheck);
-    $('#btnBackFromConflict').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromHistory').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromSearch').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromNoodles').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromDessert').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromAirfryer').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromPicker').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnSearchDish').addEventListener('click', searchDishByName);
-    $('#btnTextSearch').addEventListener('click', searchByTextInput);
-    $('#btnPickerSearch').addEventListener('click', searchByPickedIngredients);
-    $('#btnPickerClear').addEventListener('click', clearPickedIngredients);
-    $('#btnQuickKitchen').addEventListener('click', () => { renderKitchenPage(); switchPage('pageKitchen'); });
-    $('#btnQuickOrder').addEventListener('click', () => { renderOrderPage(); switchPage('pageOrder'); });
-    $('#btnBackFromKitchen').addEventListener('click', () => switchPage('pageHome'));
-    $('#btnBackFromOrder').addEventListener('click', () => switchPage('pageHome'));
-    // 厨神厨房弹窗
-    $('#btnAddDish').addEventListener('click', () => showAddDishModal());
-    $('#btnSaveDish').addEventListener('click', saveKitchenDish);
-    $('#btnCancelDish').addEventListener('click', hideAddDishModal);
-    $('#dishImageInput').addEventListener('change', previewDishImage);
-    // 点菜
-    $('#btnJoinRoom').addEventListener('click', joinOrderRoom);
-    $('#btnAddOrder').addEventListener('click', addOrderItem);
-    $('#btnSettings').addEventListener('click', showSettings);
-    $('#btnSaveSettings').addEventListener('click', saveSettings);
-    $('#btnCancelSettings').addEventListener('click', hideSettings);
-    $('#aiProvider').addEventListener('change', onProviderChange);
-    $('#btnCloseConflictAlert').addEventListener('click', hideConflictAlert);
-    $('#btnClosePreview').addEventListener('click', hideImagePreview);
-    $('#modalImagePreview').addEventListener('click', (e) => {
-        if (e.target === $('#modalImagePreview')) hideImagePreview();
-    });
-    $('#btnCloseImageSearch').addEventListener('click', hideImageSearch);
-    $('#modalImageSearch').addEventListener('click', (e) => {
-        if (e.target === $('#modalImageSearch')) hideImageSearch();
-    });
+    safeOn('#btnAddPhoto', 'click', () => $('#fileInput').click());
+    safeOn('#btnRecognize', 'click', startRecognition);
+    safeOn('#btnClear', 'click', clearAllImages);
+    safeOn('#btnQuickConflict', 'click', () => switchPage('pageConflict'));
+    safeOn('#btnQuickHistory', 'click', () => { renderHistory(); switchPage('pageHistory'); });
+    safeOn('#btnQuickSearch', 'click', () => switchPage('pageSearch'));
+    safeOn('#btnQuickNoodles', 'click', () => { renderNoodlePage(); switchPage('pageNoodles'); });
+    safeOn('#btnQuickDessert', 'click', () => { renderDessertPage(); switchPage('pageDessert'); });
+    safeOn('#btnQuickAirfryer', 'click', () => { renderAirfryerPage(); switchPage('pageAirfryer'); });
+    safeOn('#btnQuickPicker', 'click', () => { renderPickerPage(); switchPage('pagePicker'); });
+    safeOn('#btnBackHome', 'click', () => switchPage('pageHome'));
+    safeOn('#btnRetake', 'click', () => { clearAllImages(); switchPage('pageHome'); });
+    safeOn('#btnCheckConflict', 'click', doConflictCheck);
+    safeOn('#btnBackFromConflict', 'click', () => switchPage('pageHome'));
+    safeOn('#btnBackFromHistory', 'click', () => switchPage('pageHome'));
+    safeOn('#btnBackFromSearch', 'click', () => switchPage('pageHome'));
+    safeOn('#btnBackFromNoodles', 'click', () => switchPage('pageHome'));
+    safeOn('#btnBackFromDessert', 'click', () => switchPage('pageHome'));
+    safeOn('#btnBackFromAirfryer', 'click', () => switchPage('pageHome'));
+    safeOn('#btnBackFromPicker', 'click', () => switchPage('pageHome'));
+    safeOn('#btnSearchDish', 'click', searchDishByName);
+    safeOn('#btnTextSearch', 'click', searchByTextInput);
+    safeOn('#btnPickerSearch', 'click', searchByPickedIngredients);
+    safeOn('#btnPickerClear', 'click', clearPickedIngredients);
+    safeOn('#btnSaveDish', 'click', saveKitchenDish);
+    safeOn('#btnCancelDish', 'click', hideAddDishModal);
+    safeOn('#dishImageInput', 'change', previewDishImage);
+    safeOn('#btnAddDish2', 'click', () => showAddDishModal());
+    safeOn('#btnJoinRoom2', 'click', joinOrderRoom);
+    safeOn('#btnAddOrder2', 'click', addOrderItem);
+    safeOn('#btnSettings2', 'click', showSettings);
+    safeOn('#btnSettings', 'click', showSettings);
+    safeOn('#btnSaveSettings', 'click', saveSettings);
+    safeOn('#btnCancelSettings', 'click', hideSettings);
+    safeOn('#aiProvider', 'change', onProviderChange);
+    safeOn('#btnCloseConflictAlert', 'click', hideConflictAlert);
+    safeOn('#btnClosePreview', 'click', hideImagePreview);
+    safeOn('#modalImagePreview', 'click', (e) => { if (e.target === $('#modalImagePreview')) hideImagePreview(); });
+    safeOn('#btnCloseImageSearch', 'click', hideImageSearch);
+    safeOn('#modalImageSearch', 'click', (e) => { if (e.target === $('#modalImageSearch')) hideImageSearch(); });
     document.addEventListener('paste', handlePaste);
+
 }
 
 // ==================== 图片管理 ====================
+let _cameraMode = false;
 function handleFilesSelected(e) {
-    processFiles(Array.from(e.target.files));
+    const files = Array.from(e.target.files);
     e.target.value = '';
+    if (files.length === 0) return;
+    if (_cameraMode) {
+        _cameraMode = false;
+        state.images = [];
+        processFiles(files).then(() => {
+            if (state.images.length > 0) startRecognition();
+        });
+    } else {
+        processFiles(files);
+    }
 }
 
 function handlePaste(e) {
@@ -168,6 +168,7 @@ function compressImage(file, maxSize, quality) {
 
 function renderImageGrid() {
     const grid = $('#imageGrid');
+    if (!grid) return;  // 拍照区域已移除
     grid.innerHTML = '';
     state.images.forEach(img => {
         const slot = document.createElement('div');
@@ -188,9 +189,12 @@ function renderImageGrid() {
 }
 
 function updateButtons() {
+    const btnR = $('#btnRecognize');
+    const btnC = $('#btnClear');
+    if (!btnR || !btnC) return;
     const h = state.images.length > 0;
-    $('#btnRecognize').disabled = !h;
-    $('#btnClear').disabled = !h;
+    btnR.disabled = !h;
+    btnC.disabled = !h;
 }
 
 function previewImage(src) { $('#previewImage').src = src; $('#modalImagePreview').classList.add('show'); }
@@ -226,7 +230,7 @@ async function loadMoreRecipes() {
 
 已推荐过的菜（请勿重复）：${shown.join('、')}
 
-请作为中餐大厨，再推荐 10 道用这些食材能做的其他经典菜。
+请作为中餐大厨，再推荐 5 道用这些食材能做的其他经典菜。
 
 返回纯 JSON：
 {
@@ -241,7 +245,7 @@ async function loadMoreRecipes() {
     }
   ]
 }
-要求：dishes 列 10 道，必须是上面"已推荐过"列表里没有的菜。`;
+要求：dishes 列 5 道，必须是上面"已推荐过"列表里没有的菜。`;
 
     showLoading('搜索更多菜谱中...');
 
@@ -257,7 +261,7 @@ async function loadMoreRecipes() {
             ];
             renderResult(state.currentResult);
             switchPage('pageResult');
-            showToast(`✅ 新增 ${result.dishes.length} 道菜谱`);
+            showToast(`✅ 已追加 ${result.dishes.length} 道菜谱`);
         } else {
             showToast('没有找到更多菜谱了~');
         }
@@ -269,7 +273,7 @@ async function loadMoreRecipes() {
 
 /** 纯文字 AI 调用（加载更多用） */
 async function callAITextOnly(apiKey, prompt) {
-    const provider = localStorage.getItem('aiProvider') || 'qwen';
+    const provider = localStorage.getItem('aiProvider') || 'zhipu';
     const customModel = localStorage.getItem('modelName') || '';
 
     let endpoint, model;
@@ -281,6 +285,14 @@ async function callAITextOnly(apiKey, prompt) {
         case 'qwen':
             endpoint = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
             model = customModel || 'qwen-plus';
+            break;
+        case 'zhipu':
+            endpoint = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+            model = customModel || 'glm-4-flash';
+            break;
+        case 'stepfun':
+            endpoint = 'https://api.stepfun.com/v1/chat/completions';
+            model = customModel || 'step-1v-8k';
             break;
         case 'custom':
             endpoint = localStorage.getItem('customEndpoint') || '';
@@ -347,7 +359,7 @@ async function startRecognition(editedIngredients) {
 }
 
 async function callAI(apiKey, editedIngredients) {
-    const provider = localStorage.getItem('aiProvider') || 'qwen';
+    const provider = localStorage.getItem('aiProvider') || 'zhipu';
     const customModel = localStorage.getItem('modelName') || '';
 
     const prompt = editedIngredients
@@ -365,7 +377,15 @@ async function callAI(apiKey, editedIngredients) {
                 break;
             case 'qwen':
                 endpoint = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-                model = customModel || 'qwen-plus';  // 文字查询不需要 VL 模型
+                model = customModel || 'qwen-plus';
+                break;
+            case 'zhipu':
+                endpoint = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+                model = customModel || 'glm-4-flash';
+                break;
+            case 'stepfun':
+                endpoint = 'https://api.stepfun.com/v1/chat/completions';
+                model = customModel || 'step-1v-8k';
                 break;
             case 'custom':
                 endpoint = localStorage.getItem('customEndpoint') || '';
@@ -396,7 +416,15 @@ async function callAI(apiKey, editedIngredients) {
                 break;
             case 'qwen':
                 endpoint = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-                model = customModel || 'qwen-vl-plus';
+                model = customModel || 'qwen-vl-max';
+                break;
+            case 'zhipu':
+                endpoint = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+                model = customModel || 'glm-4v-flash';
+                break;
+            case 'stepfun':
+                endpoint = 'https://api.stepfun.com/v1/chat/completions';
+                model = customModel || 'step-1v-8k';
                 break;
             case 'custom':
                 endpoint = localStorage.getItem('customEndpoint') || '';
@@ -486,7 +514,7 @@ function buildVisionPrompt() {
 
 重要：
 - ingredients 必须列出所有识别到的食材
-- dishes 务必列出该食材 10 道最经典的做法（不要少于10道），每道都要有完整步骤
+- dishes 务必列出该食材 8 道最经典的做法，每道都要有完整步骤
 - 比如里脊肉：糖醋里脊、鱼香肉丝、锅包肉、青椒肉丝、干炸里脊、葱爆肉、水煮肉片、宫保肉丁、回锅肉、木须肉
 - 如果食材不能一起做，canCookTogether 填 false，在 alternatives 里分别说每种能做什么
 - conflicts 注意海鲜+维C、柿子+螃蟹等相克组合
@@ -498,7 +526,7 @@ function buildRecipeOnlyPrompt(ingredients) {
     const list = arr.join('、');
     return `用户有这些食材：${list}
 
-请作为中餐大厨，告诉我能用这些食材做什么菜，尽量列满 10 道经典做法。
+请作为中餐大厨，告诉我能用这些食材做什么菜，尽量列满 8 道经典做法。
 
 请返回纯 JSON（不要加解释）：
 
@@ -520,7 +548,7 @@ function buildRecipeOnlyPrompt(ingredients) {
   "nutrition": "营养说明"
 }
 
-要求：dishes 务必列满 10 道经典家常做法（不要少），每道至少 3 个步骤。`;
+要求：dishes 务必列满 8 道经典家常做法（不要少），每道至少 3 个步骤。`;
 }
 
 // ==================== 工具函数 ====================
@@ -788,7 +816,7 @@ function renderResult(result) {
         html += `
             <div style="text-align:center;margin:10px 0 16px;">
                 <button class="btn btn-outline" id="btnLoadMore" style="font-size:15px;padding:14px 28px;">
-                    🍳 查看更多菜谱（再搜 10 道）
+                    🍳 查看更多菜谱（再搜 5 道）
                 </button>
             </div>
         `;
@@ -1007,7 +1035,7 @@ function loadHistory() {
 
 // ==================== 设置 ====================
 function showSettings() {
-    $('#aiProvider').value = localStorage.getItem('aiProvider') || 'qwen';
+    $('#aiProvider').value = localStorage.getItem('aiProvider') || 'zhipu';
     $('#apiKey').value = localStorage.getItem('apikey') || '';
     $('#customEndpoint').value = localStorage.getItem('customEndpoint') || '';
     $('#modelName').value = localStorage.getItem('modelName') || '';
@@ -1026,12 +1054,20 @@ function onProviderChange() {
         model.placeholder = '如 gpt-4o, claude-3-5-sonnet';
     } else if (p === 'deepseek') {
         $('#customApiFields').style.display = 'none';
-        hint.innerHTML = '去 <a href="https://platform.deepseek.com" target="_blank">platform.deepseek.com</a> 获取 Key ⚠️ 可能不支持图片';
-        model.placeholder = '留空用 deepseek-chat，或填支持图片的模型名';
+        hint.innerHTML = '去 <a href="https://platform.deepseek.com" target="_blank">platform.deepseek.com</a> 获取 Key ⚠️ 识图较弱';
+        model.placeholder = '留空用 deepseek-chat';
+    } else if (p === 'zhipu') {
+        $('#customApiFields').style.display = 'none';
+        hint.innerHTML = '去 <a href="https://open.bigmodel.cn" target="_blank">open.bigmodel.cn</a> 注册获取 Key ✅ 识图强！免费额度多';
+        model.placeholder = '留空用 glm-4v-flash（免费），或填 glm-4v';
+    } else if (p === 'stepfun') {
+        $('#customApiFields').style.display = 'none';
+        hint.innerHTML = '去 <a href="https://platform.stepfun.com" target="_blank">platform.stepfun.com</a> 注册获取 Key ✅ 识图强';
+        model.placeholder = '留空用 step-1v-8k';
     } else {
         $('#customApiFields').style.display = 'none';
-        hint.innerHTML = '去 <a href="https://dashscope.aliyun.com" target="_blank">dashscope.aliyun.com</a> 获取 Key ✅ 推荐';
-        model.placeholder = '留空用 qwen-vl-plus，或填 qwen-vl-max';
+        hint.innerHTML = '去 <a href="https://dashscope.aliyun.com" target="_blank">dashscope.aliyun.com</a> 获取 Key';
+        model.placeholder = '留空用 qwen-vl-max';
     }
 }
 
@@ -1049,6 +1085,47 @@ function saveSettings() {
 function loadSettings() {}
 
 // ==================== UI 工具 ====================
+function switchTab(tab) {
+    // 更新导航栏高亮
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    // 隐藏所有页面
+    $$('.page').forEach(p => p.classList.remove('active'));
+
+    switch (tab) {
+        case 'home':
+            $('#pageHome').classList.add('active');
+            $('#headerTitle').textContent = '🍳 该做饭啦！';
+            break;
+        case 'recipes':
+            $('#pageRecipes').classList.add('active');
+            $('#headerTitle').textContent = '📖 我的菜谱';
+            renderKitchenPage2();
+            break;
+        case 'camera':
+            $('#pageHome').classList.add('active');
+            $('#headerTitle').textContent = '🍳 该做饭啦！';
+            const homeNav = document.querySelector('.nav-item[data-tab="home"]');
+            if (homeNav) homeNav.classList.add('active');
+            if (navItem) navItem.classList.remove('active');
+            _cameraMode = true;
+            $('#fileInput').click();
+            return;
+        case 'order':
+            $('#pageOrderTab').classList.add('active');
+            $('#headerTitle').textContent = '📋 点菜';
+            renderOrderPage();
+            break;
+        case 'profile':
+            $('#pageProfile').classList.add('active');
+            $('#headerTitle').textContent = '👤 我的';
+            break;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function switchPage(pageId) {
     $$('.page').forEach(p => p.classList.remove('active'));
     const target = $(`#${pageId}`);
@@ -1060,10 +1137,9 @@ function switchPage(pageId) {
 
     // 更新标题
     const titles = {
-        pageHome: '📸 拍照识菜', pageResult: '📖 识别结果', pageConflict: '⚠️ 食物相克',
+        pageHome: '🍳 该做饭啦！', pageResult: '📖 识别结果', pageConflict: '⚠️ 食物相克',
         pageHistory: '📋 历史记录', pageSearch: '🔎 搜菜谱', pageNoodles: '🍜 面食大全',
         pageDessert: '🍰 甜品大全', pageAirfryer: '🔥 空气炸锅', pagePicker: '🥬 选食材',
-        pageKitchen: '👩‍🍳 厨神厨房', pageOrder: '📋 点菜',
     };
     $('#headerTitle').textContent = titles[pageId] || '📸 拍照识菜';
 }
@@ -1416,132 +1492,31 @@ function renderAirfryerList() {
     `).join('');
 }
 
-// ==================== 流式 AI 调用 ====================
-async function callAIStream(apiKey, ingredients) {
-    const provider = localStorage.getItem('aiProvider') || 'qwen';
-    const customModel = localStorage.getItem('modelName') || '';
-
-    const prompt = ingredients
-        ? buildRecipeOnlyPrompt(ingredients)
-        : buildVisionPrompt();
-
-    let endpoint, model;
-    switch (provider) {
-        case 'deepseek':
-            endpoint = 'https://api.deepseek.com/v1/chat/completions';
-            model = customModel || 'deepseek-chat';
-            break;
-        case 'qwen':
-            endpoint = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-            model = customModel || (ingredients ? 'qwen-plus' : 'qwen-vl-plus');
-            break;
-        default:
-            endpoint = localStorage.getItem('customEndpoint') || 'https://api.deepseek.com/v1/chat/completions';
-            model = customModel || 'deepseek-chat';
-    }
-
-    const messages = [{ role: 'user', content: ingredients
-        ? prompt
-        : [{ type: 'text', text: prompt }, ...(state.images || []).map(img => ({ type: 'image_url', image_url: { url: img.dataUrl } }))]
-    }];
-
-    const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({ model, messages, max_tokens: 4096, temperature: 0.3, stream: true }),
-    });
-
-    if (!res.ok) {
-        const err = await res.text();
-        let msg = '';
-        try { msg = JSON.parse(err).error?.message || `HTTP ${res.status}`; } catch { msg = err.substring(0, 100); }
-        throw new Error(msg);
-    }
-
-    // 解析 SSE 流
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let fullText = '';
-
-    // 切换到结果页显示流式输出
-    switchPage('pageResult');
-    $('#resultContent').innerHTML = `
-        <div class="result-card">
-            <h3>🔍 AI 正在思考...</h3>
-            <div id="streamOutput" class="recipe-text" style="min-height:100px;max-height:60vh;overflow-y:auto;"></div>
-        </div>
-        <div class="action-bar">
-            <button class="btn btn-primary" id="btnBackHome">🏠 返回首页</button>
-        </div>
-    `;
-    document.getElementById('btnBackHome').addEventListener('click', () => switchPage('pageHome'));
-
-    const streamDiv = document.getElementById('streamOutput');
-
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-        for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            const data = line.slice(6).trim();
-            if (data === '[DONE]') continue;
-            try {
-                const json = JSON.parse(data);
-                const delta = json.choices?.[0]?.delta?.content || '';
-                fullText += delta;
-                streamDiv.textContent = fullText;
-                streamDiv.scrollTop = streamDiv.scrollHeight;
-            } catch (e) { /* skip bad lines */ }
-        }
-    }
-
-    // 流结束，解析并渲染结果
-    hideLoading();
-    const result = parseAIResponse(fullText, ingredients);
-    state.currentResult = result;
-    if (!ingredients) saveToHistory(result);
-    renderResult(result);
-    if (result.conflicts && result.conflicts.length > 0) {
-        setTimeout(() => showConflictAlert(result.conflicts), 600);
-    }
-}
-
-// 修改 startRecognition 使用流式
+// ==================== 快速 AI 调用（加载动画 → 直接出结果） ====================
 const _origStartRecognition = startRecognition;
 startRecognition = async function(editedIngredients) {
     const apiKey = localStorage.getItem('apikey');
     if (!apiKey) { showToast('请先配置 API Key~'); showSettings(); return; }
     if (!editedIngredients && state.images.length === 0) { showToast('请先拍照或选择图片~'); return; }
 
-    showLoading(editedIngredients ? '正在重新查询...' : 'AI 正在识别...');
+    showLoading(editedIngredients ? '大厨重新烹饪中...' : 'AI大厨正在烹饪中...');
     try {
+        const result = await callAI(apiKey, editedIngredients || undefined);
         hideLoading();
-        await callAIStream(apiKey, editedIngredients || undefined);
+        state.currentResult = result;
+        if (!editedIngredients) saveToHistory(result);
+        renderResult(result);
+        switchPage('pageResult');
+        if (result.conflicts && result.conflicts.length > 0) {
+            setTimeout(() => showConflictAlert(result.conflicts), 600);
+        }
     } catch (err) {
         hideLoading();
-        console.error(err);
-        // 流式失败，回退到非流式
-        try {
-            showLoading('流式失败，切换普通模式...');
-            const result = await callAI(apiKey, editedIngredients || undefined);
-            hideLoading();
-            state.currentResult = result;
-            renderResult(result);
-            switchPage('pageResult');
-        } catch (err2) {
-            hideLoading();
-            renderErrorPage(err2.message);
-            switchPage('pageResult');
-        }
+        renderErrorPage(err.message);
+        switchPage('pageResult');
     }
 };
 
-// 知道吃什么也用流式
 const _origSearchDish = searchDishByName;
 searchDishByName = async function() {
     const dishName = $('#searchDishInput').value.trim();
@@ -1551,22 +1526,16 @@ searchDishByName = async function() {
 
     showLoading(`搜索 ${dishName} 的做法...`);
     try {
+        const prompt = `请作为中餐大厨，告诉我"${dishName}"的做法。返回 JSON：{"ingredients":["${dishName}"],"dishes":[{"name":"${dishName}","difficulty":"中等","time":"30分钟","materials":[],"steps":["步骤"],"tip":""}],"conflicts":[],"nutrition":""}`;
+        const result = await callAITextOnly(apiKey, prompt);
         hideLoading();
-        // 用文字模式流式调用
-        const ingredients = [dishName];
-        await callAIStream(apiKey, ingredients);
+        state.currentResult = result;
+        renderResult(result);
+        switchPage('pageResult');
     } catch (err) {
         hideLoading();
-        try {
-            const prompt = `请告诉我"${dishName}"的做法。返回 JSON：{"ingredients":["${dishName}"],"dishes":[{"name":"${dishName}","difficulty":"中等","time":"30分钟","materials":[],"steps":["步骤"],"tip":""}],"conflicts":[],"nutrition":""}`;
-            const result = await callAITextOnly(apiKey, prompt);
-            state.currentResult = result;
-            renderResult(result);
-            switchPage('pageResult');
-        } catch (err2) {
-            renderErrorPage(err2.message);
-            switchPage('pageResult');
-        }
+        renderErrorPage(err.message);
+        switchPage('pageResult');
     }
 };
 
@@ -1582,9 +1551,10 @@ function saveKitchenDishes(dishes) {
     localStorage.setItem(KITCHEN_KEY, JSON.stringify(dishes));
 }
 
-function renderKitchenPage() {
+function renderKitchenPage2() {
     const dishes = getKitchenDishes();
-    const container = $('#kitchenDishes');
+    const container = $('#kitchenDishes2');
+    if (!container) return;
 
     if (dishes.length === 0) {
         container.innerHTML = `<div style="text-align:center;padding:30px;color:#9E9E9E;">
@@ -1607,6 +1577,9 @@ function renderKitchenPage() {
         </div>
     `).join('');
 }
+
+// 兼容旧函数名
+function renderKitchenPage() { renderKitchenPage2(); }
 
 function showAddDishModal(editIndex) {
     $('#dishEditId').value = editIndex !== undefined ? editIndex : '';
@@ -1659,7 +1632,7 @@ function saveKitchenDish() {
 
     saveKitchenDishes(dishes);
     hideAddDishModal();
-    renderKitchenPage();
+    renderKitchenPage2();
     showToast('✅ 已保存！');
 }
 
@@ -1672,7 +1645,7 @@ function deleteKitchenDish(index) {
     const dishes = getKitchenDishes();
     dishes.splice(index, 1);
     saveKitchenDishes(dishes);
-    renderKitchenPage();
+    renderKitchenPage2();
     showToast('已删除');
 }
 
@@ -1693,10 +1666,10 @@ function saveOrders(room, orders) {
 }
 
 function joinOrderRoom() {
-    const room = $('#orderRoomInput').value.trim();
+    const room = $('#orderRoomInput2').value.trim();
     if (!room) { showToast('请输入房间号~'); return; }
     localStorage.setItem('order_room', room);
-    $('#orderRoomStatus').textContent = `🏠 当前房间：${room}`;
+    $('#orderRoomStatus2').textContent = `🏠 当前房间：${room}`;
     renderOrderList();
     showToast('✅ 已加入房间');
 }
@@ -1704,7 +1677,7 @@ function joinOrderRoom() {
 function addOrderItem() {
     const room = getOrderRoom();
     if (!room) { showToast('请先加入房间~'); return; }
-    const dish = $('#orderDishInput').value.trim();
+    const dish = $('#orderDishInput2').value.trim();
     if (!dish) { showToast('请输入菜名~'); return; }
 
     const orders = getOrders(room);
@@ -1715,22 +1688,22 @@ function addOrderItem() {
         time: new Date().toISOString(),
     });
     saveOrders(room, orders);
-    $('#orderDishInput').value = '';
+    $('#orderDishInput2').value = '';
     renderOrderList();
     showToast('✅ 已点菜！刷新页面通知朋友来看');
 }
 
 function renderOrderPage() {
     const room = getOrderRoom();
-    $('#orderRoomInput').value = room;
-    $('#orderRoomStatus').textContent = room ? `🏠 当前房间：${room}` : '输入同一个房间号即可和朋友同步';
+    $('#orderRoomInput2').value = room;
+    $('#orderRoomStatus2').textContent = room ? `🏠 当前房间：${room}` : '输入同一个房间号即可和朋友同步';
     renderOrderList();
 }
 
 function renderOrderList() {
     const room = getOrderRoom();
     const orders = room ? getOrders(room) : [];
-    const container = $('#orderList');
+    const container = $('#orderList2');
 
     if (!room) {
         container.innerHTML = '<p style="text-align:center;color:#9E9E9E;padding:20px;">👆 先输入房间号加入</p>';

@@ -5,13 +5,13 @@
 
 /* ---------- CSS 变量 ---------- */
 :root {
-    --pink-50:  #FFF0F3;
-    --pink-100: #FFE0E5;
-    --pink-200: #FFC0CB;
-    --pink-300: #FFB6C1;
-    --pink-400: #FF8FA3;
-    --pink-500: #FF6B84;
-    --pink-600: #E8556E;
+    --pink-50:  #FFF5F7;
+    --pink-100: #FFE8EC;
+    --pink-200: #F5C6D0;
+    --pink-300: #F0A0B2;
+    --pink-400: #E87A90;
+    --pink-500: #E8536C;
+    --pink-600: #C8405A;
 
     --gray-50:  #FAFAFA;
     --gray-100: #F5F5F5;
@@ -63,7 +63,7 @@ html {
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
                  "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(180deg, var(--pink-50) 0%, var(--white) 30%);
+    background: linear-gradient(180deg, #FFF0F0 0%, #FFF5F5 30%, #FFFAFA 60%);
     background-attachment: fixed;
     color: var(--gray-800);
     min-height: 100vh;
@@ -90,10 +90,13 @@ body {
 }
 
 .logo {
-    font-size: var(--font-xl);
-    font-weight: 700;
-    color: var(--pink-500);
-    letter-spacing: -0.3px;
+    font-size: var(--font-lg);
+    font-weight: 800;
+    background: linear-gradient(135deg, #E8536C, #F08090);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
 }
 
 .btn-icon {
@@ -158,12 +161,12 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--pink-50), var(--white));
-    border-color: var(--pink-300);
-    border-style: dashed;
+    background: linear-gradient(135deg, #FFF5F7, #FFE8EC);
+    border: 2px dashed #F0A0B2;
+    border-radius: var(--radius-md);
 }
 .add-slot:active {
-    background: var(--pink-100);
+    background: linear-gradient(135deg, #FFE8EC, #FFD0D8);
     transform: scale(0.96);
 }
 
@@ -254,12 +257,14 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--pink-400), var(--pink-500));
+    background: linear-gradient(135deg, #E8536C, #F06080);
     color: white;
-    box-shadow: 0 4px 15px rgba(255,107,132,0.3);
+    box-shadow: 0 4px 15px rgba(232,83,108,0.25);
+    font-weight: 600;
 }
 .btn-primary:not(:disabled):active {
-    box-shadow: 0 2px 8px rgba(255,107,132,0.3);
+    background: linear-gradient(135deg, #D04058, #E8536C);
+    box-shadow: 0 2px 8px rgba(232,83,108,0.2);
 }
 
 .btn-outline {
@@ -291,38 +296,43 @@ body {
 /* ---------- 快捷入口 ---------- */
 .quick-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
 }
 .quick-btn {
-    padding: 14px;
+    padding: 14px 10px;
     border-radius: var(--radius-md);
     border: none;
     background: var(--white);
-    box-shadow: var(--shadow-sm);
-    font-size: var(--font-md);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    font-size: 13px;
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
     color: var(--gray-800);
+    font-weight: 500;
+    line-height: 1.4;
 }
 .quick-btn:active {
-    background: var(--pink-50);
-    transform: scale(0.97);
+    background: linear-gradient(135deg, #FFF0F0, #FFE8EC);
+    transform: scale(0.96);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
 /* ---------- 结果页 ---------- */
 .result-card {
     background: var(--white);
     border-radius: var(--radius-lg);
-    padding: 20px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow-sm);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.03);
 }
 
 .result-card h3 {
-    font-size: var(--font-lg);
-    margin-bottom: 10px;
+    font-size: var(--font-md);
+    margin-bottom: 8px;
+    font-weight: 700;
 }
 
 /* 食材标签 */
@@ -334,11 +344,11 @@ body {
 }
 .ingredient-tag {
     padding: 6px 14px;
-    background: var(--pink-50);
+    background: linear-gradient(135deg, #FFF0F0, #FFE4E8);
     color: var(--pink-600);
     border-radius: var(--radius-xl);
     font-size: var(--font-sm);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* 兼容性结果 */
@@ -609,23 +619,20 @@ select.input {
     to   { opacity: 1; transform: scale(1); }
 }
 
-.spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid var(--pink-100);
-    border-top-color: var(--pink-400);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
+/* === 加载 GIF === */
+.loading-gif {
+    width: 180px; height: 180px;
+    border-radius: 20px;
+    object-fit: cover;
+    margin: 0 auto 12px;
+    display: block;
+    box-shadow: 0 4px 20px rgba(232,83,108,0.3);
 }
 
 .loading-text {
     font-size: var(--font-lg);
-    font-weight: 600;
-    color: var(--gray-800);
+    font-weight: 700;
+    color: var(--pink-500);
 }
 .loading-sub {
     font-size: var(--font-sm);
@@ -857,6 +864,54 @@ select.input {
 .order-status.pending { background: #FEF3C7; color: #D97706; }
 .order-status.cooking { background: #DBEAFE; color: #2563EB; }
 .order-status.done { background: #D1FAE5; color: #059669; }
+
+/* === 底部导航栏 === */
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+    display: flex; justify-content: space-around; align-items: flex-end;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    padding: 6px 8px max(6px, env(safe-area-inset-bottom));
+    max-width: 500px; margin: 0 auto;
+}
+.nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 12px; cursor: pointer; transition: all 0.2s;
+    color: #B0B0B0; font-size: 10px; font-weight: 500;
+    position: relative; border-radius: 10px;
+}
+.nav-item.active { color: var(--pink-500); }
+.nav-icon { font-size: 22px; line-height: 1; }
+.nav-label { font-size: 10px; }
+.nav-center { margin-top: -18px; }
+.nav-camera {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: linear-gradient(135deg, #E8536C, #F06080);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 15px rgba(232,83,108,0.35);
+    font-size: 24px;
+}
+.nav-camera:active { transform: scale(0.9); }
+
+/* 首页内容区要给底部导航留空间 */
+.main-content { padding-bottom: 90px; }
+
+/* === 首页可爱框框 === */
+.home-section {
+    background: rgba(255,255,255,0.7);
+    border-radius: 16px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border: 1.5px solid rgba(232,83,108,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+.section-title {
+    font-size: 13px; font-weight: 700; color: var(--pink-500);
+    margin-bottom: 8px; padding-left: 2px;
+}
+.home-section .quick-actions { gap: 6px; }
 
 /* === 空气炸锅列表 === */
 .airfryer-item {

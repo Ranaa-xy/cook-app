@@ -15,7 +15,7 @@
 
     <!-- ========== 顶部导航栏 ========== -->
     <header class="header">
-        <h1 class="logo" id="headerTitle">📸 拍照识菜</h1>
+        <h1 class="logo" id="headerTitle">🍳 该做饭啦！</h1>
         <button class="btn-icon" id="btnSettings" title="设置">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"></circle>
@@ -29,40 +29,86 @@
 
         <!-- ===== 页面：首页 ===== -->
         <section id="pageHome" class="page active">
-            <div class="image-grid" id="imageGrid">
-                <div class="image-slot add-slot" id="btnAddPhoto">
-                    <div class="add-icon">+</div>
-                    <span class="add-text">拍照/选图</span>
-                </div>
-            </div>
-            <!-- 文字输入备用 -->
+            <!-- 搜索栏 -->
             <div class="text-input-area">
                 <input type="text" id="textIngredientsInput" class="input"
-                    placeholder="📝 或直接打字输入食材（用逗号分隔），如：里脊肉,青椒"
+                    placeholder="📝 输入食材，如：里脊肉,青椒"
                     style="font-size:14px;padding:10px 14px;">
-                <button class="btn btn-outline" id="btnTextSearch" style="font-size:13px;padding:10px 14px;white-space:nowrap;">
-                    🔍 搜
-                </button>
+                <button class="btn btn-primary" id="btnTextSearch" style="font-size:14px;padding:10px 16px;">🔍 搜</button>
             </div>
 
-            <p class="hint" id="hintText">📷 拍照或选图，支持多张 | 识别不出可点下方"快速选食材"</p>
-
-            <div class="action-bar">
-                <button class="btn btn-primary" id="btnRecognize" disabled>🔍 开始识别</button>
-                <button class="btn btn-ghost" id="btnClear" disabled>🗑 清空</button>
+            <!-- 功能入口 - 可爱框框分组 -->
+            <div class="home-section">
+                <div class="section-title">🍳 快速入口</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="btnQuickSearch">🔎<br>知道吃什么</button>
+                    <button class="quick-btn" id="btnQuickPicker">🥬<br>快速选食材</button>
+                    <button class="quick-btn" id="btnQuickConflict">⚠️<br>食物相克</button>
+                </div>
             </div>
+            <div class="home-section">
+                <div class="section-title">📖 食谱大全</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="btnQuickNoodles">🍜<br>面食大全</button>
+                    <button class="quick-btn" id="btnQuickDessert">🍰<br>甜品大全</button>
+                    <button class="quick-btn" id="btnQuickAirfryer">🔥<br>空气炸锅</button>
+                </div>
+            </div>
+            <div class="home-section">
+                <div class="section-title">📋 记录</div>
+                <div class="quick-actions">
+                    <button class="quick-btn" id="btnQuickHistory">📋<br>历史记录</button>
+                </div>
+            </div>
+        </section>
 
-            <!-- 功能入口 -->
-            <div class="quick-actions" style="grid-template-columns: repeat(3, 1fr);">
-                <button class="quick-btn" id="btnQuickSearch">🔎 知道吃什么</button>
-                <button class="quick-btn" id="btnQuickNoodles">🍜 面食大全</button>
-                <button class="quick-btn" id="btnQuickDessert">🍰 甜品大全</button>
-                <button class="quick-btn" id="btnQuickPicker">🥬 快速选食材</button>
-                <button class="quick-btn" id="btnQuickAirfryer">🔥 空气炸锅</button>
-                <button class="quick-btn" id="btnQuickConflict">⚠️ 食物相克</button>
-                <button class="quick-btn" id="btnQuickKitchen">👩‍🍳 厨神厨房</button>
-                <button class="quick-btn" id="btnQuickOrder">📋 点菜</button>
-                <button class="quick-btn" id="btnQuickHistory">📋 历史记录</button>
+        <!-- ===== Tab页：菜谱（厨神厨房） ===== -->
+        <section id="pageRecipes" class="page">
+            <div style="padding-top:4px;">
+                <button class="btn btn-primary" id="btnAddDish2" style="width:100%;margin-bottom:12px;">＋ 添加新菜</button>
+                <div id="kitchenDishes2"></div>
+            </div>
+        </section>
+
+        <!-- ===== Tab页：点菜 ===== -->
+        <section id="pageOrderTab" class="page">
+            <div style="padding-top:4px;">
+                <div class="order-room-area">
+                    <input type="text" id="orderRoomInput2" class="input" placeholder="输入房间号（两人填一样的）" style="flex:1;">
+                    <button class="btn btn-primary" id="btnJoinRoom2" style="white-space:nowrap;">加入</button>
+                </div>
+                <p id="orderRoomStatus2" style="text-align:center;font-size:12px;color:#9E9E9E;margin:6px 0;"></p>
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                    <input type="text" id="orderDishInput2" class="input" placeholder="输入想点的菜..." style="flex:1;">
+                    <button class="btn btn-primary" id="btnAddOrder2" style="white-space:nowrap;">➕ 点菜</button>
+                </div>
+                <div id="orderList2"></div>
+            </div>
+        </section>
+
+        <!-- ===== Tab页：我的 ===== -->
+        <section id="pageProfile" class="page">
+            <div style="padding-top:8px;">
+                <div class="result-card" style="cursor:pointer;" id="btnSettings2">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="font-size:28px;">⚙️</span>
+                        <div>
+                            <div style="font-weight:600;">AI 设置</div>
+                            <div style="font-size:12px;color:#9E9E9E;">配置 API Key 和模型</div>
+                        </div>
+                        <span style="margin-left:auto;color:#CCC;">›</span>
+                    </div>
+                </div>
+                <div class="result-card" onclick="switchPage('pageHistory')" style="cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <span style="font-size:28px;">📋</span>
+                        <div>
+                            <div style="font-weight:600;">历史记录</div>
+                            <div style="font-size:12px;color:#9E9E9E;">查看之前的识别记录</div>
+                        </div>
+                        <span style="margin-left:auto;color:#CCC;">›</span>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -142,15 +188,6 @@
             <button class="btn btn-outline" id="btnBackFromAirfryer">🏠 返回首页</button>
         </section>
 
-        <!-- ===== 页面：厨神小雨的厨房 ===== -->
-        <section id="pageKitchen" class="page">
-            <h2 style="text-align:center;margin-bottom:4px;">👩‍🍳 厨神小雨的厨房</h2>
-            <p style="text-align:center;color:#9E9E9E;font-size:13px;margin-bottom:14px;">我的私房菜谱</p>
-            <button class="btn btn-primary" id="btnAddDish" style="width:100%;margin-bottom:12px;">＋ 添加新菜</button>
-            <div id="kitchenDishes"></div>
-            <button class="btn btn-outline" id="btnBackFromKitchen">🏠 返回首页</button>
-        </section>
-
         <!-- ===== 添加/编辑菜品弹窗 ===== -->
         <div class="modal-overlay" id="modalAddDish">
             <div class="modal-card">
@@ -170,25 +207,6 @@
             </div>
         </div>
 
-        <!-- ===== 页面：点菜 ===== -->
-        <section id="pageOrder" class="page">
-            <h2 style="text-align:center;margin-bottom:4px;">📋 点菜</h2>
-            <p style="text-align:center;color:#9E9E9E;font-size:13px;margin-bottom:12px;">
-                和你朋友一起用～点什么菜对方都能看到
-            </p>
-            <div class="order-room-area">
-                <input type="text" id="orderRoomInput" class="input" placeholder="输入房间号（两人填一样的）" style="flex:1;">
-                <button class="btn btn-primary" id="btnJoinRoom" style="white-space:nowrap;">加入</button>
-            </div>
-            <p id="orderRoomStatus" style="text-align:center;font-size:12px;color:#9E9E9E;margin:6px 0;"></p>
-            <div style="display:flex;gap:8px;margin-bottom:12px;">
-                <input type="text" id="orderDishInput" class="input" placeholder="输入想点的菜..." style="flex:1;">
-                <button class="btn btn-primary" id="btnAddOrder" style="white-space:nowrap;">➕ 点菜</button>
-            </div>
-            <div id="orderList"></div>
-            <button class="btn btn-outline" id="btnBackFromOrder">🏠 返回首页</button>
-        </section>
-
         <!-- ===== 页面：快速选食材 ===== -->
         <section id="pagePicker" class="page">
             <h2 style="text-align:center;margin-bottom:8px;">🥬 手动选食材</h2>
@@ -206,12 +224,31 @@
 
     </main>
 
+    <!-- ========== 底部导航栏 ========== -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-item active" data-tab="home" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span><span class="nav-label">首页</span>
+        </div>
+        <div class="nav-item" data-tab="recipes" onclick="switchTab('recipes')">
+            <span class="nav-icon">📖</span><span class="nav-label">菜谱</span>
+        </div>
+        <div class="nav-item nav-center" data-tab="camera" onclick="switchTab('camera')">
+            <div class="nav-camera"><span>📸</span></div>
+        </div>
+        <div class="nav-item" data-tab="order" onclick="switchTab('order')">
+            <span class="nav-icon">📋</span><span class="nav-label">点菜</span>
+        </div>
+        <div class="nav-item" data-tab="profile" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span><span class="nav-label">我的</span>
+        </div>
+    </nav>
+
     <!-- ========== 加载遮罩 ========== -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-card">
-            <div class="spinner"></div>
-            <p class="loading-text" id="loadingText">AI 正在识别中...</p>
-            <p class="loading-sub">请稍候</p>
+            <img src="cooking.gif" alt="烹饪中..." class="loading-gif">
+            <p class="loading-text" id="loadingText">AI大厨正在烹饪中...</p>
+            <p class="loading-sub" id="loadingSub">食材识别 + 菜谱生成</p>
         </div>
     </div>
 
@@ -222,7 +259,9 @@
             <p class="modal-desc">需要配置 AI 接口才能使用识别功能</p>
             <label class="label">AI 服务商</label>
             <select id="aiProvider" class="input">
-                <option value="qwen">通义千问（推荐 ⭐）</option>
+                <option value="qwen">通义千问</option>
+                <option value="zhipu">智谱 GLM-4V（推荐 ⭐ 识图强）</option>
+                <option value="stepfun">阶跃星辰 Step-1V（识图强）</option>
                 <option value="deepseek">DeepSeek</option>
                 <option value="custom">自定义 API</option>
             </select>
