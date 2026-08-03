@@ -230,7 +230,7 @@ async function loadMoreRecipes() {
 
 已推荐过的菜（请勿重复）：${shown.join('、')}
 
-请作为中餐大厨，再推荐 5 道用这些食材能做的其他经典菜。
+请作为中餐大厨，再推荐 3 道用这些食材能做的其他经典菜。
 
 返回纯 JSON：
 {
@@ -245,7 +245,7 @@ async function loadMoreRecipes() {
     }
   ]
 }
-要求：dishes 列 5 道，必须是上面"已推荐过"列表里没有的菜。`;
+要求：dishes 列 3 道，必须是上面"已推荐过"列表里没有的菜。`;
 
     showLoading('搜索更多菜谱中...');
 
@@ -311,7 +311,7 @@ async function callAITextOnly(apiKey, prompt) {
         body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: prompt }],
-            max_tokens: 4096,
+            max_tokens: getMaxTokens(provider),
             temperature: 0.5,
         }),
     });
@@ -399,7 +399,7 @@ async function callAI(apiKey, editedIngredients) {
         body = {
             model,
             messages: [{ role: 'user', content: prompt }],
-            max_tokens: 4096,
+            max_tokens: getMaxTokens(provider),
             temperature: 0.3,
         };
     } else {
@@ -441,7 +441,7 @@ async function callAI(apiKey, editedIngredients) {
                 role: 'user',
                 content: [{ type: 'text', text: prompt }, ...imageContents]
             }],
-            max_tokens: 4096,
+            max_tokens: getMaxTokens(provider),
             temperature: 0.3,
         };
     }
@@ -514,7 +514,7 @@ function buildVisionPrompt() {
 
 重要：
 - ingredients 必须列出所有识别到的食材
-- dishes 务必列出该食材 8 道最经典的做法，每道都要有完整步骤
+- dishes 务必列出该食材 5 道最经典的做法，每道都要有完整步骤
 - 比如里脊肉：糖醋里脊、鱼香肉丝、锅包肉、青椒肉丝、干炸里脊、葱爆肉、水煮肉片、宫保肉丁、回锅肉、木须肉
 - 如果食材不能一起做，canCookTogether 填 false，在 alternatives 里分别说每种能做什么
 - conflicts 注意海鲜+维C、柿子+螃蟹等相克组合
@@ -526,7 +526,7 @@ function buildRecipeOnlyPrompt(ingredients) {
     const list = arr.join('、');
     return `用户有这些食材：${list}
 
-请作为中餐大厨，告诉我能用这些食材做什么菜，尽量列满 8 道经典做法。
+请作为中餐大厨，告诉我能用这些食材做什么菜，列出 5 道经典做法。
 
 请返回纯 JSON（不要加解释）：
 
@@ -548,10 +548,14 @@ function buildRecipeOnlyPrompt(ingredients) {
   "nutrition": "营养说明"
 }
 
-要求：dishes 务必列满 8 道经典家常做法（不要少），每道至少 3 个步骤。`;
+要求：dishes 务必列满 5 道经典家常做法（不要少），每道至少 3 个步骤。`;
 }
 
 // ==================== 工具函数 ====================
+function getMaxTokens(provider) {
+    if (provider === 'zhipu') return 1024;  // 智谱限制
+    return 4096;
+}
 /** 确保食材一定是数组 */
 function ensureArray(val) {
     if (Array.isArray(val)) return val;
@@ -561,26 +565,23 @@ function ensureArray(val) {
 
 // ==================== JSON 解析（核心修复） ====================
 function parseAIResponse(text, editedIngredients) {
-    const cleanText = text.trim();
+    let cleanText = text.trim();
+
+    // 策略0：去掉编号前缀（智谱经常返回 "1. ```json"）
+    cleanText = cleanText.replace(/^\d+\.\s*```(?:json)?\s*\n?/i, '').replace(/^```(?:json)?\s*\n?/i, '');
+    cleanText = cleanText.replace(/\n?```\s*$/i, '').trim();
 
     // 策略1：直接解析
     try { return normalizeResult(JSON.parse(cleanText), editedIngredients); } catch (e) {}
 
-    // 策略2：去除 markdown 代码块后解析
-    const noMd = cleanText
-        .replace(/^```(?:json)?\s*\n?/i, '')
-        .replace(/\n?```\s*$/i, '')
-        .trim();
-    try { return normalizeResult(JSON.parse(noMd), editedIngredients); } catch (e) {}
-
-    // 策略3：正则提取 JSON 块
+    // 策略2：正则提取 JSON 块（更宽松的匹配）
     const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
         try { return normalizeResult(JSON.parse(jsonMatch[0]), editedIngredients); } catch (e) {}
     }
 
-    // 策略4：部分提取（就算 JSON 不完全对，也尽量提取有用信息）
-    console.warn('所有 JSON 解析策略均失败，原始回复：', text);
+    // 策略3：部分提取
+    console.warn('JSON 解析失败，原始回复：', text);
     const partial = extractPartialResult(cleanText, editedIngredients);
     partial._parseFailed = true;
     partial._rawText = text;
@@ -816,7 +817,7 @@ function renderResult(result) {
         html += `
             <div style="text-align:center;margin:10px 0 16px;">
                 <button class="btn btn-outline" id="btnLoadMore" style="font-size:15px;padding:14px 28px;">
-                    🍳 查看更多菜谱（再搜 5 道）
+                    🍳 查看更多菜谱（再搜 3 道）
                 </button>
             </div>
         `;
@@ -1518,26 +1519,6 @@ startRecognition = async function(editedIngredients) {
 };
 
 const _origSearchDish = searchDishByName;
-searchDishByName = async function() {
-    const dishName = $('#searchDishInput').value.trim();
-    if (!dishName) { showToast('请输入菜名~'); return; }
-    const apiKey = localStorage.getItem('apikey');
-    if (!apiKey) { showToast('请先配置 API Key~'); showSettings(); return; }
-
-    showLoading(`搜索 ${dishName} 的做法...`);
-    try {
-        const prompt = `请作为中餐大厨，告诉我"${dishName}"的做法。返回 JSON：{"ingredients":["${dishName}"],"dishes":[{"name":"${dishName}","difficulty":"中等","time":"30分钟","materials":[],"steps":["步骤"],"tip":""}],"conflicts":[],"nutrition":""}`;
-        const result = await callAITextOnly(apiKey, prompt);
-        hideLoading();
-        state.currentResult = result;
-        renderResult(result);
-        switchPage('pageResult');
-    } catch (err) {
-        hideLoading();
-        renderErrorPage(err.message);
-        switchPage('pageResult');
-    }
-};
 
 // ==================== 厨神小雨的厨房 ====================
 const KITCHEN_KEY = 'kitchen_dishes_v1';
